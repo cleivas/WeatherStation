@@ -31,7 +31,7 @@ void WeatherStation::begin(int ir)
 // WSTLIB_OK
 // WSTLIB_ERROR_CHECKSUM
 // WSTLIB_ERROR_TIMEOUT
-int WeatherStation::readRTH(uint8_t pin)
+int WeatherStation::readRHT03(uint8_t pin)
 {
 	// READ VALUES
 	int rv = read(pin);

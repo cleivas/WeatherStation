@@ -36,7 +36,7 @@ void loop(){
   
   windRotTime = ws.getWindRotationTime(); 
    
-  if (ws.readRTH() == WSLIB_OK){
+  if (ws.readRHT03() == WSLIB_OK){
     humidity = ws.getHumidity();
     temperature = ws.getTemperature();
   }
@@ -56,8 +56,7 @@ void loop(){
   delay(30000); 
 }
 
-
-
+//Function to write a string of the weather data to the text file "datalog.txt"
 void writeToSD(String data){
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
 

@@ -25,7 +25,7 @@ class WeatherStation
 {
 public:
     void begin(int ir = A1);
-    int readRTH(uint8_t pin = 5);
+    int readRHT03(uint8_t pin = 5);
 	double getHumidity();
 	double getTemperature();
 	int getWindRotationTime();
