@@ -28,17 +28,28 @@ public:
     int readRHT03(uint8_t pin = 5);
 	double getHumidity();
 	double getTemperature();
-	int getWindRotationTime();
-	String dataToString(double t, double h, int w);
+	double getWindRPS();
+	int getSoundPollution();
+	String dataToString(double t, double h, double w, int s);
 
 private:
-    int threshhold;
     int IR;
 	uint8_t bits[5];  // buffer to receive data
 	int read(uint8_t pin);
 	double humidity;
 	double temperature;
+	double windRotations;
+	int sound;
+	long soundSum;
+	int soundCount;
+	int wr;
+	long startTime;
 	String doubleToString(double input, int decimalPlaces);
+
+	long currentMillis;
+	long previousMillis;
+	long previousSoundMillis;
+	long interval;
 };
 #endif
 //

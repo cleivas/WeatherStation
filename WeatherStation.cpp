@@ -18,15 +18,26 @@
 void WeatherStation::begin(int ir)
 {
     IR = ir;
-    Serial.print("Default wind sensor value ... ");
-    delay(2000);
-    Serial.println(analogRead(IR));
+    pinMode(IR, INPUT_PULLUP);
+    //pinMode(16, INPUT_PULLUP);
+    //Serial.println(analogRead(IR));
 
-    pinMode(IR, INPUT);
-    digitalWrite(IR, HIGH);
-    threshhold = analogRead(IR)+100;
+    humidity = 0;
+    temperature = 0;
+    windRotations = 0;
+    wr = 0;
+    startTime = 0;
+    sound = 0;
+    soundSum = 0;
+    soundCount = 0;
+
+
+    previousMillis = 0;
+    currentMillis = 0;
+    previousSoundMillis = 0;
+    interval = 1000;
+    Serial.begin(9600);
 }
-
 // return values:
 // WSTLIB_OK
 // WSTLIB_ERROR_CHECKSUM
@@ -61,33 +72,49 @@ int WeatherStation::readRHT03(uint8_t pin)
 
 	return WSLIB_OK;
 }
-int WeatherStation::getWindRotationTime(){
-    int n = 0;
-    int rotations = 3;
-    int rotTime[rotations];
-    long previousMillis = 0;
 
-    //Read ir 10 times
-    while(n<rotations){
+double WeatherStation::getWindRPS(){
+   for(int i = 5000; i>0; i--){
+    if(digitalRead(IR)==HIGH){
+        delay(1);
+        long cm = millis();
 
-        if(analogRead(IR)>threshhold){
-            while(analogRead(IR)>threshhold);
-            rotTime[n] = millis()-previousMillis;
-            previousMillis = millis();
-            n++;
+        while(digitalRead(IR)==HIGH){
+            delay(1);
+            if(millis() - cm > interval){
+                wr = millis() - startTime;
+                startTime = millis();
+                return 0;
+            //Serial.println(windRotations);
+            }
         }
-
-    }
-    //calculate average rotation time, ignore first time
-    int s = 0;
-    for(int i=1; i<rotations; i++){
-        s += rotTime[i];
+        wr = millis() - startTime;
+        startTime = millis();
+        //Serial.println(wr);
     }
 
-    int windspeed = s/rotations;
-    return windspeed;
-    //return n;
+    if(millis()-startTime > 2000) windRotations = 0;
+    else windRotations = 1/(wr*0.001);
+    //Serial.println(windRotations);
+   }
+    return windRotations;
 }
+
+int WeatherStation::getSoundPollution(){
+    soundSum += analogRead(A2);
+    soundCount++;
+
+    if(millis()-previousSoundMillis>interval){
+        sound = soundSum/soundCount;
+        soundSum = 0;
+        soundCount = 0;
+        previousSoundMillis = millis();
+    }
+
+    return sound;
+}
+
+
 
 double WeatherStation::getTemperature(){
     return temperature;
@@ -97,14 +124,16 @@ double WeatherStation::getHumidity(){
     return humidity;
 }
 
-String WeatherStation::dataToString(double t, double h, int w){
+String WeatherStation::dataToString(double t, double h, double w, int s){
     String data = "";
     data += "T: ";
     data += doubleToString(t, 1);
     data += "\t H: ";
     data += doubleToString(h, 1);
     data += "\t W: ";
-    data += String(w);
+    data += doubleToString(w,1);
+    data += "\t S: ";
+    data += doubleToString(s,0);
 
     return data;
 }
@@ -182,6 +211,7 @@ String WeatherStation::doubleToString(double input, int decimalPlaces){
         return String((int)input);
     }
 }
+
 
 //
 // END OF FILE
