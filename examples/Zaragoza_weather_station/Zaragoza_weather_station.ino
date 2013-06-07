@@ -1,11 +1,16 @@
-// Weather Station
-//
-//
-//
-//
-// (c) Arduino Verkstad AB 2013
-// Author: Clara Leivas
-//
+/* 
+Weather Station
+(c) Arduino Verkstad AB 2013
+Author: Clara Leivas
+
+This weather station reads the temperature, air humidity, wind speed
+and sound pollution of the close envionment. Every fifth second a 
+photo is taken and the data is saved to an micro sd Card.
+
+For more instructions, please see
+http://cuartielles.com/verkstad/edu/CoursesSummerCampZGZEs/Ballooning
+
+*/
 
 
 
@@ -28,7 +33,7 @@ int LED = 9;
 //Timer varibales
 long previousMillis = 0;
 long currentMillis = 0;
-long interval = 3000;
+long interval = 5000;
 
 
 void setup(){
